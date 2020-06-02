@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS
+
+  Test SAM template
+
+Parameters:
+  dbName:
+    Type: String
+  dbUsername:
+    Type: String
+  dbPassword:
+    Type: String
+  dbHost:
+    Type: String
+
+Globals:
+  Function:
+    Timeout: 2
+    Environment:
+      Variables:
+        DB_NAME: !Ref dbName
+        DB_USERNAME: !Ref dbUsername
+        DB_PASSWORD: !Ref dbPassword
+        DB_HOST: !Ref dbHost
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello_world/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+  DailyLogFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello_world/
+      Handler: daily_log.lambda_show_daily_logs
+      Runtime: python3.8
+      Timeout: 6
+      Events:
+        DailyLog:
+          Type: Api
+          Properties:
+            Path: /get-daily-logs
+            Method: get
+  WeatherSpiderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: scrapy/
+      Handler: run_spiders.lambda_save_weather_to_db
+      Runtime: python3.8
+      Timeout: 10
+      Events:
+        DailyLog:
+          Type: Api
+          Properties:
+            Path: /save-weather
+            Method: get
